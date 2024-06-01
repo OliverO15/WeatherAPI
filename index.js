@@ -8,7 +8,7 @@ dotenv.config();
 const app = express();
 app.use(express.json());
 
-app.use('/api/weather', weatherRoutes);
+app.use('/api/v1', weatherRoutes);
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => {

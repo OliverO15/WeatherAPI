@@ -1,0 +1,1 @@
+ALTER TABLE "leisures" ALTER COLUMN "coordinates" DROP NOT NULL;

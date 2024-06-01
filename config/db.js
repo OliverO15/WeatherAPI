@@ -1,12 +1,16 @@
 // config/db.js
-const { createClient } = require('drizzle-orm');
+const schema = require('../models/schema');
+const { drizzle } = require('drizzle-orm/node-postgres');
 const { Pool } = require('pg');
 require('dotenv').config();
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-const db = createClient(pool);
+const db = drizzle(pool, schema);
 
 module.exports = db;

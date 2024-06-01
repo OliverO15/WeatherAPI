@@ -1,0 +1,1 @@
+ALTER TABLE "forecasts" ADD CONSTRAINT "unique_forecast" UNIQUE("date","weather_station_id");

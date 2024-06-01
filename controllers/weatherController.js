@@ -14,14 +14,21 @@ async function createWeatherStation(req, res) {
   res.status(201).json(newStation);
 }
 
-async function createWeatherData(req, res) {
-  const data = req.body;
-  const newData = await weatherService.addWeatherData(data);
+async function createForecasts(req, res) {
+  const newData = await weatherService.updateForecasts();
   res.status(201).json(newData);
+}
+
+async function getWeatherStation(req, res) {
+  console.log('getWeatherStation');
+  const id = req.query.id;
+  const station = await weatherService.getWeatherStationById(id);
+  res.status(200).json(station);
 }
 
 module.exports = {
   getWeatherStations,
   createWeatherStation,
-  createWeatherData,
+  createForecasts,
+  getWeatherStation
 };

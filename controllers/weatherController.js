@@ -5,6 +5,7 @@ const weatherService = require('../services/weatherService');
 
 async function createForecasts(req, res) {
   const newData = await weatherService.updateForecasts();
+  console.log('Updated Forecasts Successfully');
   res.status(201).json(newData);
 }
 

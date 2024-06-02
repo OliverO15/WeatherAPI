@@ -4,7 +4,7 @@ const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
 const { Forecast, WeatherStation, Place, Leisure } = require('../models/schema');
-const { eq } = require('drizzle-orm');
+const { eq, lt } = require('drizzle-orm');
 
 async function fetchWeatherData() {
   try {
@@ -64,6 +64,14 @@ async function updateForecasts() {
   }
 
   return updatedForecasts;
+}
+
+async function removeOldForecasts() {
+  const today = new Date();
+  today.setUTCHours(0, 0, 0, 0);  // Set the time to midnight UTC
+
+  const res = await db.delete(Forecast).where(lt(Forecast.date, today));
+  return res;
 }
 
 async function getWeatherStationById(id) {
@@ -129,6 +137,7 @@ async function getPlaceByStationId(stationId, withLeisure = false) {
 
 module.exports = {
   updateForecasts,
+  removeOldForecasts,
   getWeatherStationById,
   getForecasts,
   getPlaceByStationId

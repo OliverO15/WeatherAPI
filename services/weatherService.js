@@ -3,7 +3,7 @@ const { parseStringPromise } = require('xml2js');
 const db = require('../config/db');
 const fs = require('fs');
 const path = require('path');
-const { Forecast, WeatherStation } = require('../models/schema');
+const { Forecast, WeatherStation, Place, Leisure } = require('../models/schema');
 const { eq } = require('drizzle-orm');
 
 async function fetchWeatherData() {
@@ -78,7 +78,58 @@ async function getWeatherStationById(id) {
   }
 }
 
+async function getForecasts(date) {
+  try {
+    // Create a new Date object from the input date
+    const dateObj = new Date(date);
+
+    // Set the time to midnight UTC
+    dateObj.setUTCHours(0, 0, 0, 0);
+
+    // Convert the Date object to an ISO string
+    const isoDate = dateObj.toISOString();
+
+    const result = await db.select().from(Forecast).where(eq(Forecast.date, isoDate));
+    return result;
+  } catch (error) {
+    console.error(`Error fetching forecasts for date ${date}:`, error);
+    return null;
+  }
+}
+
+async function getPlaceByStationId(stationId, withLeisure = false) {
+  try {
+    const weatherStation = await getWeatherStationById(stationId);
+
+    if (weatherStation.length === 0) {
+      return null;
+    }
+
+    const placeId = weatherStation[0].placeId;
+
+    const result = await db.select().from(Place).where(eq(Place.id, placeId));
+
+    if (result.length === 0) {
+      return null;
+    }
+
+    const place = result[0];
+
+    if (withLeisure) {
+      const leisures = await db.select().from(Leisure).where(eq(Leisure.placeId, placeId));
+      place.leisures = leisures;
+    }
+
+    return place;
+  } catch (error) {
+    console.error(`Error fetching place for weather station with ID ${stationId}:`, error);
+    return null;
+  }
+}
+
 module.exports = {
   updateForecasts,
-  getWeatherStationById
+  getWeatherStationById,
+  getForecasts,
+  getPlaceByStationId
 };
